@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MdDelete } from "react-icons/md";
-import { FaRegSquare, FaRegCircle, FaArrowRight } from "react-icons/fa";
+import { FaRegSquare, FaRegCircle, FaArrowRight,FaPen  } from "react-icons/fa";
 import { CiText } from "react-icons/ci";
 import { GoDiamond } from "react-icons/go";
 import { IoRemoveOutline } from "react-icons/io5";
@@ -40,6 +40,12 @@ const Navbar = ({ onClearCanvas, onColorChange, onSelectShape }) => {
         className={`text-md p-2 hover:bg-zinc-700 rounded-lg ml-2 ${selectedShape === 'pointer' ? 'bg-zinc-700' : ''}`}
       >
         <LuMousePointer2 />
+      </button>
+      <button
+        onClick={() => selectShape('pen')}
+        className={`text-md p-2 hover:bg-zinc-700 rounded-lg ml-2 ${selectedShape === 'pen' ? 'bg-zinc-700' : ''}`}
+      >
+        <FaPen />
       </button>
       <div className='flex gap-4 ml-2 bg-zinc-700/75 px-6 py-2 rounded-lg max-sm:gap-1'>
         <button
