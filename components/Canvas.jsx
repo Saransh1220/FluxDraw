@@ -147,7 +147,7 @@ const Canvas = () => {
   return (
     <div>
       <Navbar onClearCanvas={clearCanvas} onColorChange={handleColorChange} onSelectShape={selectShape} />
-      <Sidebar />
+      {/* <Sidebar /> */}
       <canvas
         {...bind()}
         ref={canvasRef}
