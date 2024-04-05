@@ -87,7 +87,7 @@ const Navbar = ({ onClearCanvas, onColorChange, onSelectShape }) => {
           <FaArrowRight />
         </button> 
       </div>
-      <div className='relative'>
+      <div className='relative sm:hidden'>
       <div onClick={toggleChildVisibility} className='bg-zinc-700/75 p-2 rounded-lg ml-2 cursor-pointer'>
         <FaAngleDown style={{ transform: isChildVisible ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }} />
       </div>
