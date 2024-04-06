@@ -2,7 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useGesture } from '@use-gesture/react';
 import Navbar from './Navbar';
-import Sidebar from '../components/Sidebar';
+import Sidebar from './Sidebar';
+import Undo from './Undo';
+import Logo from './Logo';
 
 const Canvas = () => {
   const [selectedShape, setSelectedShape] = useState('pointer');
@@ -13,9 +15,7 @@ const Canvas = () => {
   const [rectangles, setRectangles] = useState([]); // Storing rectangles with their color
   const [tempCircle, setTempCircle] = useState(null); // Temporary circle during drawing
   const [circles, setCircles] = useState([]); // Storing circles with their color
-  
   const canvasRef = useRef(null);
-
   useEffect(() => {
     const resizeCanvas = () => {
       const canvas = canvasRef.current;
@@ -146,14 +146,16 @@ const Canvas = () => {
 
   return (
     <div>
+      <Logo/>
       <Navbar onClearCanvas={clearCanvas} onColorChange={handleColorChange} onSelectShape={selectShape} />
-      {/* <Sidebar /> */}
+      <Sidebar />
       <canvas
         {...bind()}
         ref={canvasRef}
         className="border border-none"
         style={{ touchAction: 'none' }}
       />
+      <Undo/>
     </div>
   );
 };
