@@ -3,10 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useGesture } from '@use-gesture/react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
-import Undo from './Undo';
 import Logo from './Logo';
+import Undo from './Undo';
 
 const Canvas = () => {
+  const canvasRef = useRef(null);
   const [selectedShape, setSelectedShape] = useState('pointer');
   const [lineColor, setLineColor] = useState('#ffffff'); // Default color
   const [drawing, setDrawing] = useState(false);
@@ -15,7 +16,9 @@ const Canvas = () => {
   const [rectangles, setRectangles] = useState([]); // Storing rectangles with their color
   const [tempCircle, setTempCircle] = useState(null); // Temporary circle during drawing
   const [circles, setCircles] = useState([]); // Storing circles with their color
-  const canvasRef = useRef(null);
+  const [undoStack, setUndoStack] = useState([]); // Undo stack
+  const [redoStack, setRedoStack] = useState([]); // Redo stack
+
   useEffect(() => {
     const resizeCanvas = () => {
       const canvas = canvasRef.current;
@@ -32,6 +35,20 @@ const Canvas = () => {
   useEffect(() => {
     drawAll();
   }, [penLines, rectangles, tempRectangle, tempCircle, circles]); // Redraw when state changes
+  
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === 'z') {
+        undo();
+      }
+    };
+  
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  
   
   const drawAll = () => {
     const canvas = canvasRef.current;
@@ -80,7 +97,15 @@ const Canvas = () => {
     const x = xy[0] - rect.left;
     const y = xy[1] - rect.top;
     setDrawing(true);
-
+  
+    // Capture current state before drawing
+    const currentState = {
+      penLines,
+      rectangles,
+      circles,
+    };
+    setUndoStack((prevUndoStack) => [currentState, ...prevUndoStack]);
+  
     if (selectedShape === 'pen') {
       setPenLines((prevLines) => [...prevLines, { color: lineColor, points: [{ x, y }] }]);
     } else if (selectedShape === 'square') {
@@ -89,6 +114,7 @@ const Canvas = () => {
       setTempCircle({ x, y, radius: 0, color: lineColor }); // Start a new temp circle
     }
   };
+  
 
   const continueDrawing = ({ xy }) => {
     if (!drawing) return;
@@ -121,6 +147,15 @@ const Canvas = () => {
       setTempCircle(null); // Clear the temporary circle
     }
     setDrawing(false);
+
+    // Push current state to undo stack after drawing
+    const currentState = {
+      penLines,
+      rectangles,
+      circles,
+    };
+    setUndoStack((prevUndoStack) => [currentState, ...prevUndoStack]);
+    setRedoStack([]); // Clear redo stack after new drawing action
   };
 
   const clearCanvas = () => {
@@ -128,6 +163,8 @@ const Canvas = () => {
     setPenLines([]);
     setCircles([]);
     setTempRectangle(null);
+    setUndoStack([]); // Clear undo stack after clearing canvas
+    setRedoStack([]); // Clear redo stack after clearing canvas
   };
 
   const handleColorChange = (color) => {
@@ -138,6 +175,37 @@ const Canvas = () => {
     setSelectedShape(shape);
   };
 
+  const undo = () => {
+    if (undoStack.length === 0) return;
+  
+    const currentState = {
+      penLines,
+      rectangles,
+      circles,
+    };
+  
+
+    setRedoStack((prevRedoStack) => [currentState, ...prevRedoStack]);
+    const prevState = undoStack.shift(); // Change pop to shift
+  
+    // Restore previous state
+    setPenLines(prevState.penLines);
+    setRectangles(prevState.rectangles);
+    setCircles(prevState.circles);
+  };
+
+  const redo = () => {
+    if (redoStack.length === 0) return;
+
+    const nextState = redoStack.shift();
+    setUndoStack((prevUndoStack) => [nextState, ...prevUndoStack]);
+
+    // Restore next state
+    setPenLines(nextState.penLines);
+    setRectangles(nextState.rectangles);
+    setCircles(nextState.circles);
+  };
+
   const bind = useGesture({
     onDragStart: startDrawing,
     onDrag: continueDrawing,
@@ -146,7 +214,7 @@ const Canvas = () => {
 
   return (
     <div>
-      <Logo/>
+      <Logo />
       <Navbar onClearCanvas={clearCanvas} onColorChange={handleColorChange} onSelectShape={selectShape} />
       <Sidebar />
       <canvas
@@ -155,10 +223,9 @@ const Canvas = () => {
         className="border border-none"
         style={{ touchAction: 'none' }}
       />
-      <Undo/>
+      <Undo onUndo={undo} onRedo={redo} />
     </div>
   );
 };
 
 export default Canvas;
-
