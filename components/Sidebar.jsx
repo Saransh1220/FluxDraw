@@ -9,7 +9,7 @@ const Sidebar = () => {
   }
   return (
     <>
-    <button onClick={handleclick} className='absolute bottom-4 left-8 text-2xl bg-zinc-700 p-2 rounded-lg'>
+    <button onClick={handleclick} className='absolute bottom-4 left-8 text-lg bg-zinc-700 p-2 rounded-lg'>
        <GiHamburgerMenu />
     </button>
       {isSidebarOpen && (

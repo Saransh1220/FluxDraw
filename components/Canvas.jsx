@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Logo from './Logo';
 import Undo from './Undo';
+import TextComponent from './TextComponent';
 
 const Canvas = () => {
   const canvasRef = useRef(null);
@@ -18,12 +19,13 @@ const Canvas = () => {
   const [circles, setCircles] = useState([]); // Storing circles with their color
   const [undoStack, setUndoStack] = useState([]); // Undo stack
   const [redoStack, setRedoStack] = useState([]); // Redo stack
+  
 
   useEffect(() => {
     const resizeCanvas = () => {
       const canvas = canvasRef.current;
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 56; // Subtracting navbar height
+      canvas.height = window.innerHeight ; // Subtracting navbar height
       drawAll();
     };
 
@@ -217,6 +219,7 @@ const Canvas = () => {
       <Logo />
       <Navbar onClearCanvas={clearCanvas} onColorChange={handleColorChange} onSelectShape={selectShape} />
       <Sidebar />
+      <TextComponent/>
       <canvas
         {...bind()}
         ref={canvasRef}
